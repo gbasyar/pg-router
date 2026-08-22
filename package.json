@@ -1,0 +1,40 @@
+{
+  "name": "pg-router",
+  "version": "1.0.0",
+  "description": "Smart Open-Source Indonesian Payment Gateway Router & Fee Optimizer",
+  "author": "Jun <gbasyar>",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "pg-router": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/cli/index.ts",
+    "test": "vitest run",
+    "lint": "eslint src"
+  },
+  "keywords": [
+    "payment-gateway",
+    "indonesia",
+    "qris",
+    "smart-router",
+    "pakasir",
+    "tripay",
+    "midtrans",
+    "duitku",
+    "xendit",
+    "ipaymu"
+  ],
+  "dependencies": {
+    "commander": "^12.1.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.14",
+    "tsx": "^4.17.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  }
+}
