@@ -40,14 +40,19 @@ export class SandboxAdapter implements IGatewayAdapter {
 
   async verifyWebhook(payload: WebhookPayload): Promise<WebhookResult> {
     const body = typeof payload.rawBody === 'string' ? JSON.parse(payload.rawBody) : payload.rawBody;
+    const rawStatus = typeof body.status === 'string' ? body.status.toUpperCase() : 'PENDING';
+    const status: WebhookResult['status'] = ['PAID', 'EXPIRED', 'FAILED', 'PENDING'].includes(rawStatus)
+      ? rawStatus as WebhookResult['status']
+      : 'PENDING';
+
     return {
       isValid: true,
-      orderId: body.orderId || 'SBX-ORDER',
-      transactionId: body.transactionId || `SBX-${Date.now()}`,
+      orderId: typeof body.orderId === 'string' ? body.orderId : 'SBX-ORDER',
+      transactionId: typeof body.transactionId === 'string' ? body.transactionId : `SBX-${Date.now()}`,
       amount: Number(body.amount || 0),
-      status: 'PAID',
-      paidAt: new Date(),
-      signatureVerified: true
+      status,
+      paidAt: status === 'PAID' ? new Date() : undefined,
+      signatureVerified: false,
     };
   }
 }

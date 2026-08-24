@@ -1,139 +1,113 @@
 # PG Router ⚡
 
-> **Smart Open-Source Indonesian Payment Gateway Router & Fee Optimizer**
+> TypeScript payment-routing SDK for Indonesian payment gateways.
 
-**PG Router** adalah engine routing dan SDK pembayaran open-source yang secara cerdas memilih payment gateway termurah dan tercepat untuk transaksi bisnis Anda di Indonesia (QRIS, Virtual Account, E-Wallet).
+PG Router provides fee-based and priority-based routing, safe fallback semantics, a unified adapter contract, and verified webhook normalization.
 
----
+> **Maturity:** Pakasir QRIS is the first documentation-audited adapter. Tripay and Midtrans are reserved adapter surfaces and intentionally do not create payments until their official contracts are implemented and tested. Sandbox is simulation-only.
 
-## 🎯 Mengapa PG Router?
-
-Setiap payment gateway di Indonesia memiliki struktur biaya (*fee*) yang berbeda:
-- **QRIS:** Ada yang 0.7% flat, ada yang 0.7% + Rp 750 per transaksi.
-- **Virtual Account:** Biaya berkisar antara Rp 2.500 hingga Rp 4.500 tergantung bank dan provider.
-- **E-Wallet:** Fee variatif antara 1.5% hingga 2.0%.
-
-Dengan **PG Router**, sistem Anda tidak lagi terkunci pada satu gateway (*vendor lock-in*). PG Router menghitung komparasi biaya secara real-time dan mengarahkan transaksi ke provider yang paling hemat.
-
----
-
-## ✨ Fitur Utama
-
-- **Smart Dynamic Routing (`lowest_fee`):** Otomatis memilih rute dengan potongan terkecil berdasarkan nominal transaksi.
-- **High Availability & Fallback:** Mengalihkan request ke gateway cadangan jika provider utama mengalami *downtime*.
-- **Unified Request & Response:** Satu format payload standar untuk membuat tagihan QRIS, VA, dan E-Wallet ke semua gateway.
-- **Unified Webhook Verification:** Otomatis memvalidasi signature webhook dari berbagai provider tanpa repot membaca dokumentasi satu per satu.
-- **Multi-Gateway Ready:** Mendukung Pakasir, Tripay, Midtrans, Duitku, Xendit, iPaymu, Paydisini, dan Sandbox lokal.
-- **Developer First:** Tersedia sebagai TypeScript Library SDK dan CLI simulator.
-
----
-
-## 📦 Instalasi
+## Installation
 
 ```bash
 npm install pg-router
-# atau
-pnpm add pg-router
 ```
 
----
+## Supported providers
 
-## 🚀 Penggunaan Cepat
+| Provider | Create payment | Webhook/status verification | Maturity |
+| --- | --- | --- | --- |
+| Pakasir | QRIS | Server-to-server transaction-detail confirmation | Mock-tested against official docs |
+| Sandbox | Simulated methods | Simulated | Development only |
+| Tripay | Not yet implemented | Not yet implemented | Planned |
+| Midtrans | Not yet implemented | Not yet implemented | Planned |
+| Duitku, Xendit, iPaymu, Paydisini | Not yet implemented | Not yet implemented | Planned |
 
-### 1. Inisialisasi Router
+Pakasir has no documented webhook signature. PG Router therefore treats its webhook as an untrusted notification and confirms the transaction through Pakasir's authenticated Transaction Detail API. `signatureVerified` remains `false` even when `isValid` is `true`.
+
+## Quick start
 
 ```typescript
 import { PGRouter } from 'pg-router';
 
 const router = new PGRouter({
-  strategy: 'lowest_fee', // Strategi: 'lowest_fee' | 'priority' | 'fallback'
+  strategy: 'lowest_fee',
   gateways: {
     pakasir: {
       enabled: true,
       slug: process.env.PAKASIR_SLUG!,
       apiKey: process.env.PAKASIR_API_KEY!,
+      priority: 1,
+      // Optional override when your merchant fee differs from the default:
+      customFees: {
+        QRIS: { percent: 0.7, flat: 0 },
+      },
     },
-    tripay: {
-      enabled: true,
-      apiKey: process.env.TRIPAY_API_KEY!,
-      privateKey: process.env.TRIPAY_PRIVATE_KEY!,
-      merchantCode: process.env.TRIPAY_MERCHANT_CODE!,
-    },
-    midtrans: {
-      enabled: true,
-      serverKey: process.env.MIDTRANS_SERVER_KEY!,
-      clientKey: process.env.MIDTRANS_CLIENT_KEY!,
-    },
-    sandbox: {
-      enabled: process.env.NODE_ENV !== 'production'
-    }
-  }
+  },
 });
-```
 
-### 2. Membuat Tagihan Pembayaran
-
-```typescript
 const payment = await router.createPayment({
   orderId: 'INV-2026-0801',
-  amount: 50000,
+  amount: 50_000,
   method: 'QRIS',
-  customerName: 'Budi Santoso',
-  customerEmail: 'budi@example.com'
+  returnUrl: 'https://merchant.example/payments/return',
 });
 
-console.log(`Transaksi diarahkan ke: ${payment.gateway}`);
-console.log(`Estimasi Fee: Rp ${payment.feeCalculated}`);
-console.log(`String QRIS: ${payment.qrString}`);
+console.log(payment.gateway, payment.qrString, payment.totalAmount);
 ```
 
-### 3. Menangani Webhook Notifikasi
+## Routing strategies
+
+- `lowest_fee`: selects the enabled adapter with the lowest calculated fee.
+- `priority`: selects the lowest numeric `priority` value.
+- `fallback`: tries providers in priority order **only after a definitive rejection**.
+
+An ambiguous timeout or transport failure raises `PaymentCreationUnknownError` and stops fallback. This prevents two providers from creating active payments for the same order.
+
+## Webhook handling
+
+Pass the provider's original body to `handleWebhook`:
 
 ```typescript
-app.post('/api/webhook/:provider', async (req, res) => {
-  const result = await router.handleWebhook({
-    gateway: req.params.provider,
-    rawHeaders: req.headers,
-    rawBody: req.body
-  });
-
-  if (result.isValid && result.status === 'PAID') {
-    // Update status pesanan di database Anda
-    await markOrderAsPaid(result.orderId, result.paidAt);
-  }
-
-  res.json({ success: true });
+const result = await router.handleWebhook({
+  gateway: 'pakasir',
+  rawHeaders: req.headers,
+  rawBody: req.body,
 });
+
+if (result.isValid && result.status === 'PAID') {
+  await markOrderAsPaid(result.orderId, result.amount);
+}
 ```
 
----
+Your application must still enforce durable idempotency for order fulfillment.
 
-## 💻 CLI Simulator
+## Custom adapters
 
-Uji coba keputusan routing langsung dari terminal Anda:
+Implement `IGatewayAdapter` and pass adapters as the second constructor argument. A custom adapter with the same provider name replaces the built-in adapter.
+
+```typescript
+const router = new PGRouter(options, [myTripayAdapter]);
+```
+
+## CLI fee simulation
 
 ```bash
 npx pg-router simulate --amount 25000 --method QRIS
 ```
 
-Output:
-```text
-🔍 Finding best route for QRIS with amount Rp 25.000...
+The bundled CLI currently demonstrates the documentation-audited Pakasir route. It does not include sandbox in fee comparisons.
 
-✅ Recommended Route: [PAKASIR]
-   Estimated Fee: Rp 175
-   Net Settlement: Rp 24.825
+## Development
+
+```bash
+npm ci
+npm test
+npm run lint
+npm run build
 ```
 
----
+See [CONTRIBUTING.md](CONTRIBUTING.md) and the [Pakasir API contract](docs/pakasir-api.md).
 
-## 🤝 Panduan Kontribusi
+## License
 
-Ingin menambahkan adapter payment gateway baru atau menyempurnakan kalkulasi fee?
-Silakan baca aturan dan standar kontribusi di **[CONTRIBUTING.md](CONTRIBUTING.md)**.
-
----
-
-## 📄 Lisensi
-
-Proyek ini dilisensikan di bawah [MIT License](LICENSE).
+[MIT](LICENSE)

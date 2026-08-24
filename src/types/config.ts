@@ -1,4 +1,4 @@
-import { FeeStructure, GatewayProvider, PaymentMethod } from '../types/index.js';
+import { FeeStructure, PaymentMethod } from '../types/index.js';
 
 export interface BaseGatewayConfig {
   enabled: boolean;

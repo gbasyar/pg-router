@@ -1,6 +1,6 @@
 {
   "name": "pg-router",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Smart Open-Source Indonesian Payment Gateway Router & Fee Optimizer",
   "author": "Jun <gbasyar>",
   "license": "MIT",
@@ -13,7 +13,9 @@
     "build": "tsc",
     "dev": "tsx watch src/cli/index.ts",
     "test": "vitest run",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "prepublishOnly": "npm test && npm run lint && npm run typecheck && npm run build",
+    "typecheck": "tsc -p tsconfig.test.json"
   },
   "keywords": [
     "payment-gateway",
@@ -28,13 +30,37 @@
     "ipaymu"
   ],
   "dependencies": {
-    "commander": "^12.1.0",
-    "zod": "^3.23.8"
+    "commander": "^12.1.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^20.14.14",
+    "eslint": "^10.9.0",
     "tsx": "^4.17.0",
     "typescript": "^5.5.4",
-    "vitest": "^2.0.5"
-  }
+    "typescript-eslint": "^8.67.0",
+    "vitest": "^4.1.11"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gbasyar/pg-router.git"
+  },
+  "homepage": "https://github.com/gbasyar/pg-router#readme",
+  "bugs": {
+    "url": "https://github.com/gbasyar/pg-router/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CONTRIBUTING.md",
+    "docs"
+  ],
+  "directories": {
+    "doc": "docs"
+  },
+  "type": "commonjs"
 }
