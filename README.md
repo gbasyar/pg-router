@@ -216,8 +216,8 @@ CLI akan memandu kamu:
    GoPay Merchant / GoBiz OTP Authentication CLI      
 ======================================================
 
-📱 Masukkan Nomor HP GoBiz: 085161861838
-⏳ Mengirimkan kode OTP ke +6285161861838...
+📱 Masukkan Nomor HP GoBiz: 081234567890
+⏳ Mengirimkan kode OTP ke +6281234567890...
 ✅ Kode OTP 4 digit telah dikirimkan via SMS/WhatsApp!
 
 🔑 Masukkan 4 Digit Kode OTP: 1234
@@ -226,7 +226,7 @@ CLI akan memandu kamu:
 ======================================================
    🎉 LOGIN GOBIZ BERHASIL & TERVERIFIKASI!          
 ======================================================
-Outlet Name : Toko Saya
+Outlet Name : Toko Demo
 Merchant ID : G123456789
 
 💾 Simpan otomatis ke file .env di folder ini? (y/N): y

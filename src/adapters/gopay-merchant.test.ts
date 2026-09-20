@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { PaymentCreationRejectedError } from './base.js';
 import { generateDynamicQRIS, GopayMerchantAdapter } from './gopay-merchant.js';
 
-const staticQris = '00020101021126610014COM.GO-JEK.WWW01189360091435644633060210G5644633060303UMI51440014ID.CO.QRIS.WWW0215ID10265981591130303UMI5204899953033605802ID5925YNS CORP, Digital & Kreat6009TANGERANG61051515162070703A01630491D4';
+const staticQris = '00020101021126620014COM.GO-JEK.WWW01189360091400000000000210G00000000000303UMI51450014ID.CO.QRIS.WWW0215ID102000000000000303UMI5204899953033605802ID5916Toko Demo Online6007JAKARTA61051234062070703A01630485E8';
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -20,7 +20,7 @@ describe('generateDynamicQRIS', () => {
     const dynamic1000 = generateDynamicQRIS(staticQris, 1000);
     expect(dynamic1000).toContain('010212'); // dynamic indicator
     expect(dynamic1000).toContain('54041000'); // amount tag
-    expect(dynamic1000.endsWith('63041946')).toBe(true); // CRC16
+    expect(dynamic1000.endsWith('6304DE06')).toBe(true); // CRC16
 
     const dynamic50000 = generateDynamicQRIS(staticQris, 50000);
     expect(dynamic50000).toContain('540550000');
