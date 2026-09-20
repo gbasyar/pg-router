@@ -1,13 +1,14 @@
 {
   "name": "pg-router",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Smart Open-Source Indonesian Payment Gateway Router & Fee Optimizer",
   "author": "Jun <gbasyar>",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "pg-router": "dist/cli/index.js"
+    "pg-router": "dist/cli/index.js",
+    "pgrouter": "dist/cli/index.js"
   },
   "scripts": {
     "build": "tsc",
