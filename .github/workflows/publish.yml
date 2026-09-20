@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
 
 jobs:
@@ -17,13 +17,15 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
 
+      - run: npm install -g npm@latest
       - run: npm ci
       - run: npm test
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run build
 
-      - name: Publish to NPM via OIDC (Provenance)
+      - name: Publish to NPM via OIDC
         run: npm publish --provenance --access public
