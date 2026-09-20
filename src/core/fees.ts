@@ -33,6 +33,9 @@ export const DEFAULT_GATEWAY_FEES: Record<GatewayProvider, Partial<Record<Paymen
   sumopod: {
     QRIS: { percent: 0.7, flat: 0 },
   },
+  gopay_merchant: {
+    QRIS: { percent: 0.3, flat: 0 },
+  },
   duitku: {
     QRIS: { percent: 0.7, flat: 700 },
     VA_BCA: { percent: 0, flat: 3000 },

@@ -21,6 +21,7 @@ npm install pg-router
 | Paydisini | QRIS, Virtual Accounts (BCA/BRI/BNI/Mandiri/Permata) | MD5 signature callback verification | Verified |
 | Midtrans | QRIS (GoPay), Virtual Accounts (BCA/BRI/BNI/Mandiri/Permata), E-Wallets | SHA-512 signature verification | Verified |
 | Sumopod | QRIS | Svix HMAC-SHA256 / Webhook-Token verification | Verified |
+| GoPay Merchant | QRIS (Dynamic EMVCo generation) | Real-time transaction polling & settlement check | Verified |
 | Sandbox | Simulated methods | Simulated | Development only |
 | Duitku, Xendit, iPaymu | Not yet implemented | Not yet implemented | Planned |
 
