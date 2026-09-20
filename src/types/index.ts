@@ -16,6 +16,7 @@ export type GatewayProvider =
   | 'paydisini'
   | 'midtrans'
   | 'sumopod'
+  | 'gopay_merchant'
   | 'duitku'
   | 'ipaymu'
   | 'xendit'

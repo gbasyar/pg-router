@@ -44,6 +44,14 @@ export interface SumopodConfig extends BaseGatewayConfig {
   baseUrl?: string;
 }
 
+export interface GopayMerchantConfig extends BaseGatewayConfig {
+  staticQris: string;
+  accessToken?: string;
+  merchantId?: string;
+  connectorUrl?: string;
+  connectorApiKey?: string;
+}
+
 export interface DuitkuConfig extends BaseGatewayConfig {
   merchantCode: string;
   apiKey: string;
@@ -63,6 +71,7 @@ export interface PGRouterOptions {
     paydisini?: PaydisiniConfig;
     midtrans?: MidtransConfig;
     sumopod?: SumopodConfig;
+    gopay_merchant?: GopayMerchantConfig;
     duitku?: DuitkuConfig;
     xendit?: XenditConfig;
     sandbox?: BaseGatewayConfig;

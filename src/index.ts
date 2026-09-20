@@ -8,4 +8,5 @@ export * from './adapters/tripay.js';
 export * from './adapters/paydisini.js';
 export * from './adapters/midtrans.js';
 export * from './adapters/sumopod.js';
+export * from './adapters/gopay-merchant.js';
 export * from './adapters/sandbox.js';
