@@ -226,7 +226,7 @@ CLI akan memandu kamu:
 ======================================================
    🎉 LOGIN GOBIZ BERHASIL & TERVERIFIKASI!          
 ======================================================
-Outlet Name : Toko Saya
+Outlet Name : Toko Demo
 Merchant ID : G123456789
 
 💾 Simpan otomatis ke file .env di folder ini? (y/N): y

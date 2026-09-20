@@ -20,7 +20,7 @@ describe('generateDynamicQRIS', () => {
     const dynamic1000 = generateDynamicQRIS(staticQris, 1000);
     expect(dynamic1000).toContain('010212'); // dynamic indicator
     expect(dynamic1000).toContain('54041000'); // amount tag
-    expect(dynamic1000.endsWith('63041946')).toBe(true); // CRC16
+    expect(dynamic1000.endsWith('6304DE06')).toBe(true); // CRC16
 
     const dynamic50000 = generateDynamicQRIS(staticQris, 50000);
     expect(dynamic50000).toContain('540550000');
