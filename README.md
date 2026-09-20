@@ -190,18 +190,48 @@ app.post('/api/webhook/:gateway', async (req, res) => {
 
 ### 📱 Panduan Khusus: GoPay Merchant (Direct GoBiz)
 
-Fitur ini memungkinkan kamu menerima pembayaran QRIS langsung ke akun **GoBiz / GoFood Merchant** milik tokomu tanpa potongan aggregator pihak ketiga.
+Fitur ini memungkinkan kamu menerima pembayaran QRIS langsung ke akun **GoBiz / GoFood Merchant** milik tokomu tanpa potongan aggregator pihak ketiga (0% MDR ekstra).
 
-#### Cara Mengambil String QRIS Statis GoBiz:
+#### 1. Cara Ambil String QRIS Statis:
 1. Buka aplikasi **GoBiz** di HP kamu atau unduh banner QRIS tokomu.
 2. Scan gambar QRIS tersebut menggunakan aplikasi QR Scanner di HP / web scanner ([zxing.org](https://zxing.org/w/decode)).
 3. Salin seluruh teks hasil scannya (dimulai dengan `000201010211...`).
-4. Masukkan string tersebut ke konfigurasi:
+4. Masukkan ke file `.env`:
    ```env
    GOPAY_STATIC_QRIS=00020101021126610014COM.GO-JEK.WWW0118936009...
    ```
 
-`pg-router` akan secara otomatis menyuntikkan nominal tagihan ke dalam QRIS tersebut (Tag 54) dan menghitung ulang Checksum CRC16 (Tag 63) standar EMVCo sehingga saat pembeli scan, **nominal tagihan sudah terkunci otomatis**.
+#### 2. Cara Login & Ambil Access Token GoBiz (via CLI Interaktif):
+Jalankan perintah ini di terminal project kamu:
+
+```bash
+npx pg-router gopay-login
+```
+
+CLI akan memandu kamu:
+- Masukkan nomor HP GoBiz -> terima SMS/WA OTP 4 digit -> token otomatis tersimpan ke file `.env` tokomu!
+
+```text
+======================================================
+   GoPay Merchant / GoBiz OTP Authentication CLI      
+======================================================
+
+📱 Masukkan Nomor HP GoBiz: 085161861838
+⏳ Mengirimkan kode OTP ke +6285161861838...
+✅ Kode OTP 4 digit telah dikirimkan via SMS/WhatsApp!
+
+🔑 Masukkan 4 Digit Kode OTP: 1234
+⏳ Memverifikasi OTP & mengambil token...
+
+======================================================
+   🎉 LOGIN GOBIZ BERHASIL & TERVERIFIKASI!          
+======================================================
+Outlet Name : Toko Saya
+Merchant ID : G123456789
+
+💾 Simpan otomatis ke file .env di folder ini? (y/N): y
+✅ File .env berhasil diperbarui!
+```
 
 ---
 
@@ -209,21 +239,18 @@ Fitur ini memungkinkan kamu menerima pembayaran QRIS langsung ke akun **GoBiz / 
 
 `pg-router` dilengkapi dengan CLI serbaguna:
 
-### 1. Simulasi Perbandingan Biaya Gateway
+### 1. Login GoBiz via Terminal (Set-and-Forget)
+```bash
+npx pg-router gopay-login
+```
+
+### 2. Simulasi Perbandingan Biaya Gateway
 Bandingkan biaya antar gateway untuk nominal dan metode tertentu:
 ```bash
 npx pg-router simulate --amount 50000 --method QRIS
 ```
-**Contoh Hasil:**
-```text
-🔍 Finding lowest fee route for QRIS with amount Rp 50.000...
 
-✅ Recommended Route: [GOPAY_MERCHANT]
-   Estimated Fee: Rp 150
-   Net Settlement: Rp 49.850
-```
-
-### 2. Konversi QRIS Statis ke Dinamis via Terminal
+### 3. Konversi QRIS Statis ke Dinamis via Terminal
 ```bash
 npx pg-router qris-convert --static "0002010102112661..." --amount 25000
 ```
