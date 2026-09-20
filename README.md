@@ -16,11 +16,12 @@ npm install pg-router
 
 | Provider | Create payment | Webhook/status verification | Maturity |
 | --- | --- | --- | --- |
-| Pakasir | QRIS | Server-to-server transaction-detail confirmation | Mock-tested against official docs |
+| Pakasir | QRIS | Server-to-server transaction-detail confirmation | Verified |
+| Tripay | QRIS, Virtual Accounts (BCA/BRI/BNI/Mandiri/Permata), E-Wallets | HMAC-SHA256 signature verification | Verified |
+| Paydisini | QRIS, Virtual Accounts (BCA/BRI/BNI/Mandiri/Permata) | MD5 signature callback verification | Verified |
 | Sandbox | Simulated methods | Simulated | Development only |
-| Tripay | Not yet implemented | Not yet implemented | Planned |
 | Midtrans | Not yet implemented | Not yet implemented | Planned |
-| Duitku, Xendit, iPaymu, Paydisini | Not yet implemented | Not yet implemented | Planned |
+| Duitku, Xendit, iPaymu | Not yet implemented | Not yet implemented | Planned |
 
 Pakasir has no documented webhook signature. PG Router therefore treats its webhook as an untrusted notification and confirms the transaction through Pakasir's authenticated Transaction Detail API. `signatureVerified` remains `false` even when `isValid` is `true`.
 

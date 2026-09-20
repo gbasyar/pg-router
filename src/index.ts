@@ -5,5 +5,6 @@ export * from './core/fees.js';
 export * from './adapters/base.js';
 export * from './adapters/pakasir.js';
 export * from './adapters/tripay.js';
+export * from './adapters/paydisini.js';
 export * from './adapters/midtrans.js';
 export * from './adapters/sandbox.js';

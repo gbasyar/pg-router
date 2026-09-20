@@ -14,8 +14,11 @@ export const DEFAULT_GATEWAY_FEES: Record<GatewayProvider, Partial<Record<Paymen
     VA_BRI: { percent: 0, flat: 3500 },
     VA_BNI: { percent: 0, flat: 3500 },
     VA_MANDIRI: { percent: 0, flat: 3500 },
+    VA_PERMATA: { percent: 0, flat: 3500 },
     EWALLET_DANA: { percent: 1.67, flat: 0 },
     EWALLET_OVO: { percent: 1.67, flat: 0 },
+    EWALLET_SHOPEEPAY: { percent: 2.0, flat: 0 },
+    EWALLET_GOPAY: { percent: 2.0, flat: 0 },
   },
   midtrans: {
     QRIS: { percent: 0.7, flat: 0 },
@@ -46,6 +49,11 @@ export const DEFAULT_GATEWAY_FEES: Record<GatewayProvider, Partial<Record<Paymen
   },
   paydisini: {
     QRIS: { percent: 0.7, flat: 0 },
+    VA_BCA: { percent: 0, flat: 3000 },
+    VA_BRI: { percent: 0, flat: 3000 },
+    VA_BNI: { percent: 0, flat: 3000 },
+    VA_MANDIRI: { percent: 0, flat: 3000 },
+    VA_PERMATA: { percent: 0, flat: 3000 },
   },
   sandbox: {
     QRIS: { percent: 0, flat: 0 },

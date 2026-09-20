@@ -4,6 +4,7 @@ import { calculateFee, DEFAULT_GATEWAY_FEES } from './fees.js';
 import { IGatewayAdapter, PaymentCreationRejectedError } from '../adapters/base.js';
 import { PakasirAdapter } from '../adapters/pakasir.js';
 import { TripayAdapter } from '../adapters/tripay.js';
+import { PaydisiniAdapter } from '../adapters/paydisini.js';
 import { MidtransAdapter } from '../adapters/midtrans.js';
 import { SandboxAdapter } from '../adapters/sandbox.js';
 
@@ -45,6 +46,9 @@ export class PGRouter {
     }
     if (this.options.gateways.tripay?.enabled) {
       this.adapters.set('tripay', new TripayAdapter(this.options.gateways.tripay));
+    }
+    if (this.options.gateways.paydisini?.enabled) {
+      this.adapters.set('paydisini', new PaydisiniAdapter(this.options.gateways.paydisini));
     }
     if (this.options.gateways.midtrans?.enabled) {
       this.adapters.set('midtrans', new MidtransAdapter(this.options.gateways.midtrans));

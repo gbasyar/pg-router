@@ -18,6 +18,14 @@ export interface TripayConfig extends BaseGatewayConfig {
   privateKey: string;
   merchantCode: string;
   isSandbox?: boolean;
+  baseUrl?: string;
+}
+
+export interface PaydisiniConfig extends BaseGatewayConfig {
+  apiKey: string;
+  merchantId?: string;
+  isSandbox?: boolean;
+  baseUrl?: string;
 }
 
 export interface MidtransConfig extends BaseGatewayConfig {
@@ -42,6 +50,7 @@ export interface PGRouterOptions {
   gateways: {
     pakasir?: PakasirConfig;
     tripay?: TripayConfig;
+    paydisini?: PaydisiniConfig;
     midtrans?: MidtransConfig;
     duitku?: DuitkuConfig;
     xendit?: XenditConfig;
