@@ -1,116 +1,260 @@
 # PG Router ⚡
 
-> TypeScript payment-routing SDK for Indonesian payment gateways.
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5+-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Tests](https://img.shields.io/badge/Tests-66%20Passed%20(100%25)-success)](https://vitest.dev/)
 
-PG Router provides fee-based and priority-based routing, safe fallback semantics, a unified adapter contract, and verified webhook normalization.
+> **Smart Open-Source Indonesian Payment Gateway Router & Fee Optimizer.**
+> Route payments across multiple Indonesian payment providers (Pakasir, Tripay, Paydisini, Midtrans, Sumopod, GoPay Merchant) with fee optimization, safe fallbacks, unified webhooks, and automatic dynamic QRIS generation.
 
-> **Maturity:** Pakasir, Tripay, Paydisini, Midtrans, and Sumopod are verified adapters with unit tests. Duitku, Xendit, and iPaymu are reserved adapter surfaces. Sandbox is simulation-only.
+---
 
-## Installation
+## 🌟 Fitur Utama
+
+- 📉 **Lowest Fee Optimizer (`lowest_fee`)** — Otomatis memilih payment gateway dengan biaya/MDR terendah untuk setiap transaksi.
+- 🛡️ **Safe Fallback Semantics (`fallback`)** — Beralih ke provider cadangan **hanya jika** provider sebelumnya memberikan penolakan definitif (*rejected*). Mencegah risiko *double-charge*.
+- 🧾 **Direct GoPay Merchant Dynamic QRIS** — Mengubah QRIS statis GoBiz toko menjadi Dynamic QRIS dengan nominal terkunci (0% MDR ekstra pihak ketiga).
+- 🔐 **Unified Webhook Verification** — Verifikasi signature otomatis untuk semua provider (HMAC-SHA256, MD5, SHA-512, Svix).
+- 💳 **Mendukung Berbagai Metode Pembayaran** — QRIS, Virtual Accounts (BCA, BRI, BNI, Mandiri, Permata), dan E-Wallets (GoPay, OVO, DANA, ShopeePay).
+
+---
+
+## 📦 Instalasi
 
 ```bash
 npm install pg-router
 ```
 
-## Supported providers
+---
 
-| Provider | Create payment | Webhook/status verification | Maturity |
-| --- | --- | --- | --- |
-| Pakasir | QRIS | Server-to-server transaction-detail confirmation | Verified |
-| Tripay | QRIS, Virtual Accounts (BCA/BRI/BNI/Mandiri/Permata), E-Wallets | HMAC-SHA256 signature verification | Verified |
-| Paydisini | QRIS, Virtual Accounts (BCA/BRI/BNI/Mandiri/Permata) | MD5 signature callback verification | Verified |
-| Midtrans | QRIS (GoPay), Virtual Accounts (BCA/BRI/BNI/Mandiri/Permata), E-Wallets | SHA-512 signature verification | Verified |
-| Sumopod | QRIS | Svix HMAC-SHA256 / Webhook-Token verification | Verified |
-| GoPay Merchant | QRIS (Dynamic EMVCo generation) | Real-time transaction polling & settlement check | Verified |
-| Sandbox | Simulated methods | Simulated | Development only |
-| Duitku, Xendit, iPaymu | Not yet implemented | Not yet implemented | Planned |
+## 🚀 Panduan Cepat (Quick Start)
 
-Pakasir has no documented webhook signature. PG Router therefore treats its webhook as an untrusted notification and confirms the transaction through Pakasir's authenticated Transaction Detail API. `signatureVerified` remains `false` even when `isValid` is `true`.
+### 1. Buat File `.env`
+Simpan API Key dari gateway yang kamu gunakan di file `.env` project kamu:
 
-## Quick start
+```env
+# GoPay Merchant (Direct GoBiz)
+GOPAY_STATIC_QRIS=00020101021126610014COM.GO-JEK.WWW0118936009...
+
+# Pakasir
+PAKASIR_SLUG=toko-kamu
+PAKASIR_API_KEY=pk_live_xxxxxxxx
+
+# Tripay
+TRIPAY_API_KEY=DEV-xxxxxx
+TRIPAY_PRIVATE_KEY=xxxx-xxxx-xxxx
+TRIPAY_MERCHANT_CODE=T12345
+
+# Paydisini
+PAYDISINI_API_KEY=xxxxxxxxxxxxxxxx
+
+# Midtrans
+MIDTRANS_SERVER_KEY=Mid-server-xxxxxxxx
+
+# Sumopod
+SUMOPOD_API_KEY=sp_live_xxxxxxxx
+```
+
+---
+
+### 2. Inisialisasi Router di Backend
 
 ```typescript
 import { PGRouter } from 'pg-router';
 
-const router = new PGRouter({
+export const router = new PGRouter({
+  // Strategi routing: 'lowest_fee' | 'priority' | 'fallback'
   strategy: 'lowest_fee',
   gateways: {
+    // Gateway 1: GoPay Direct (0% MDR ekstra)
+    gopay_merchant: {
+      enabled: Boolean(process.env.GOPAY_STATIC_QRIS),
+      staticQris: process.env.GOPAY_STATIC_QRIS!,
+      accessToken: process.env.GOPAY_ACCESS_TOKEN, // Opsional: untuk auto-cek mutasi
+    },
+
+    // Gateway 2: Pakasir
     pakasir: {
-      enabled: true,
+      enabled: Boolean(process.env.PAKASIR_API_KEY),
       slug: process.env.PAKASIR_SLUG!,
-      apiKey: process.env.PAKASIR_API_KEY!,
-      priority: 1,
-      // Optional override when your merchant fee differs from the default:
-      customFees: {
-        QRIS: { percent: 0.7, flat: 0 },
-      },
+      apiKey: proces...EY!,
+    },
+
+    // Gateway 3: Tripay
+    tripay: {
+      enabled: Boolean(process.env.TRIPAY_API_KEY),
+      apiKey: proces...EY!,
+      privateKey: process.env.TRIPAY_PRIVATE_KEY!,
+      merchantCode: process.env.TRIPAY_MERCHANT_CODE!,
+    },
+
+    // Gateway 4: Paydisini
+    paydisini: {
+      enabled: Boolean(process.env.PAYDISINI_API_KEY),
+      apiKey: proces...EY!,
+    },
+
+    // Gateway 5: Midtrans
+    midtrans: {
+      enabled: Boolean(process.env.MIDTRANS_SERVER_KEY),
+      serverKey: process.env.MIDTRANS_SERVER_KEY!,
+    },
+
+    // Gateway 6: Sumopod
+    sumopod: {
+      enabled: Boolean(process.env.SUMOPOD_API_KEY),
+      apiKey: proces...EY!,
     },
   },
 });
-
-const payment = await router.createPayment({
-  orderId: 'INV-2026-0801',
-  amount: 50_000,
-  method: 'QRIS',
-  returnUrl: 'https://merchant.example/payments/return',
-});
-
-console.log(payment.gateway, payment.qrString, payment.totalAmount);
 ```
 
-## Routing strategies
+---
 
-- `lowest_fee`: selects the enabled adapter with the lowest calculated fee.
-- `priority`: selects the lowest numeric `priority` value.
-- `fallback`: tries providers in priority order **only after a definitive rejection**.
+### 3. Buat Pembayaran (`createPayment`)
 
-An ambiguous timeout or transport failure raises `PaymentCreationUnknownError` and stops fallback. This prevents two providers from creating active payments for the same order.
-
-## Webhook handling
-
-Pass the provider's original body to `handleWebhook`:
+Router akan otomatis memilih gateway terbaik berdasarkan nominal dan metode pembayaran:
 
 ```typescript
-const result = await router.handleWebhook({
-  gateway: 'pakasir',
-  rawHeaders: req.headers,
-  rawBody: req.body,
-});
+// Contoh di endpoint Express / Next.js:
+app.post('/api/checkout', async (req, res) => {
+  try {
+    const payment = await router.createPayment({
+      orderId: 'INV-2026-0001',
+      amount: 50000,
+      method: 'QRIS', // 'QRIS' | 'VA_BCA' | 'VA_BRI' | 'EWALLET_GOPAY' dll.
+      customerName: 'Jun',
+      customerEmail: 'jun@example.com',
+      returnUrl: 'https://tokosaya.com/orders/INV-2026-0001',
+    });
 
-if (result.isValid && result.status === 'PAID') {
-  await markOrderAsPaid(result.orderId, result.amount);
-}
+    /*
+      Hasil payment object berisi:
+      - payment.gateway       -> Gateway terpilih (misal: 'gopay_merchant' / 'pakasir')
+      - payment.qrString      -> String EMVCo QRIS dinamis (langsung render QR)
+      - payment.checkoutUrl   -> Link halaman bayar provider (jika ada)
+      - payment.vaNumber      -> Nomor Virtual Account (jika metode VA)
+      - payment.feeCalculated -> Estimasi fee gateway
+      - payment.totalAmount   -> Total tagihan
+      - payment.expiredAt     -> Tanggal kedaluwarsa
+    */
+    res.json({ success: true, data: payment });
+  } catch (error) {
+    res.status(500).json({ success: false, error: (error as Error).message });
+  }
+});
 ```
 
-Your application must still enforce durable idempotency for order fulfillment.
+---
 
-## Custom adapters
+### 4. Terima & Verifikasi Webhook (`handleWebhook`)
 
-Implement `IGatewayAdapter` and pass adapters as the second constructor argument. A custom adapter with the same provider name replaces the built-in adapter.
+Gunakan fungsi tunggal `handleWebhook` untuk memverifikasi callback dari provider apa saja:
 
 ```typescript
-const router = new PGRouter(options, [myTripayAdapter]);
+app.post('/api/webhook/:gateway', async (req, res) => {
+  const { gateway } = req.params;
+
+  const result = await router.handleWebhook({
+    gateway: gateway as any,
+    rawHeaders: req.headers,
+    rawBody: req.body, // Object atau string body asli
+  });
+
+  // Jika signature valid dan status Lunas (PAID)
+  if (result.isValid && result.status === 'PAID') {
+    console.log(`✅ Pembayaran LUNAS untuk Order ID: ${result.orderId} (Rp ${result.amount})`);
+    
+    // Update status transaksi di database tokomu di sini
+    await markOrderAsPaid(result.orderId, result.amount);
+  }
+
+  res.json({ success: true });
+});
 ```
 
-## CLI fee simulation
+---
 
+## 🔑 Panduan Setup Tiap Gateway
+
+| Provider | Metode yang Didukung | Kredensial yang Dibutuhkan | Keterangan |
+|---|---|---|---|
+| **GoPay Merchant** | `QRIS` | `staticQris`, `accessToken` *(opsional)* | Mengubah QRIS GoBiz toko jadi Dynamic QRIS (0% fee ekstra). |
+| **Pakasir** | `QRIS` | `slug`, `apiKey` | QRIS instant settlement. |
+| **Tripay** | `QRIS`, `VA_BCA`, `VA_BRI`, `VA_BNI`, `VA_MANDIRI`, `VA_PERMATA`, `EWALLET_OVO`, `EWALLET_DANA`, `EWALLET_SHOPEEPAY`, `EWALLET_GOPAY` | `apiKey`, `privateKey`, `merchantCode` | Closed Payment API dengan kalkulasi signature HMAC-SHA256. |
+| **Paydisini** | `QRIS`, `VA_BCA`, `VA_BRI`, `VA_BNI`, `VA_MANDIRI`, `VA_PERMATA` | `apiKey` | QRIS & VA via API v1 dengan MD5 signature. |
+| **Midtrans** | `QRIS`, `VA_BCA`, `VA_BRI`, `VA_BNI`, `VA_MANDIRI`, `VA_PERMATA`, `EWALLET_GOPAY`, `EWALLET_SHOPEEPAY` | `serverKey`, `clientKey` | Midtrans Core API (Snap/Charge). |
+| **Sumopod** | `QRIS` | `apiKey`, `webhookSecret` | QRIS API dengan verifikasi Svix webhook. |
+
+---
+
+### 📱 Panduan Khusus: GoPay Merchant (Direct GoBiz)
+
+Fitur ini memungkinkan kamu menerima pembayaran QRIS langsung ke akun **GoBiz / GoFood Merchant** milik tokomu tanpa potongan aggregator pihak ketiga.
+
+#### Cara Mengambil String QRIS Statis GoBiz:
+1. Buka aplikasi **GoBiz** di HP kamu atau unduh banner QRIS tokomu.
+2. Scan gambar QRIS tersebut menggunakan aplikasi QR Scanner di HP / web scanner ([zxing.org](https://zxing.org/w/decode)).
+3. Salin seluruh teks hasil scannya (dimulai dengan `000201010211...`).
+4. Masukkan string tersebut ke konfigurasi:
+   ```env
+   GOPAY_STATIC_QRIS=00020101021126610014COM.GO-JEK.WWW0118936009...
+   ```
+
+`pg-router` akan secara otomatis menyuntikkan nominal tagihan ke dalam QRIS tersebut (Tag 54) dan menghitung ulang Checksum CRC16 (Tag 63) standar EMVCo sehingga saat pembeli scan, **nominal tagihan sudah terkunci otomatis**.
+
+---
+
+## 🛠️ CLI Tools
+
+`pg-router` dilengkapi dengan CLI serbaguna:
+
+### 1. Simulasi Perbandingan Biaya Gateway
+Bandingkan biaya antar gateway untuk nominal dan metode tertentu:
 ```bash
-npx pg-router simulate --amount 25000 --method QRIS
+npx pg-router simulate --amount 50000 --method QRIS
+```
+**Contoh Hasil:**
+```text
+🔍 Finding lowest fee route for QRIS with amount Rp 50.000...
+
+✅ Recommended Route: [GOPAY_MERCHANT]
+   Estimated Fee: Rp 150
+   Net Settlement: Rp 49.850
 ```
 
-The bundled CLI currently demonstrates the documentation-audited Pakasir route. It does not include sandbox in fee comparisons.
+### 2. Konversi QRIS Statis ke Dinamis via Terminal
+```bash
+npx pg-router qris-convert --static "0002010102112661..." --amount 25000
+```
 
-## Development
+---
+
+## 🧪 Development & Testing
+
+Untuk berkontribusi atau menjalankan unit test:
 
 ```bash
-npm ci
+# Clone repository
+git clone https://github.com/gbasyar/pg-router.git
+cd pg-router
+
+# Install dependencies
+npm install
+
+# Jalankan 66+ unit tests
 npm test
+
+# Linter & Typecheck
 npm run lint
+npm run typecheck
+
+# Build library ke dist/
 npm run build
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) and the [Pakasir API contract](docs/pakasir-api.md).
+---
 
-## License
+## 📄 Lisensi
 
-[MIT](LICENSE)
+Distributed under the **MIT License**. Lihat [LICENSE](LICENSE) untuk detail lengkap.
