@@ -13,10 +13,11 @@ export type PaymentMethod =
 export type GatewayProvider = 
   | 'pakasir'
   | 'tripay'
+  | 'paydisini'
   | 'midtrans'
+  | 'sumopod'
   | 'duitku'
   | 'ipaymu'
-  | 'paydisini'
   | 'xendit'
   | 'sandbox';
 

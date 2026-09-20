@@ -7,4 +7,5 @@ export * from './adapters/pakasir.js';
 export * from './adapters/tripay.js';
 export * from './adapters/paydisini.js';
 export * from './adapters/midtrans.js';
+export * from './adapters/sumopod.js';
 export * from './adapters/sandbox.js';

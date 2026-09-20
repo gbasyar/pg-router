@@ -6,6 +6,7 @@ import { PakasirAdapter } from '../adapters/pakasir.js';
 import { TripayAdapter } from '../adapters/tripay.js';
 import { PaydisiniAdapter } from '../adapters/paydisini.js';
 import { MidtransAdapter } from '../adapters/midtrans.js';
+import { SumopodAdapter } from '../adapters/sumopod.js';
 import { SandboxAdapter } from '../adapters/sandbox.js';
 
 type Candidate = { provider: GatewayProvider; fee: number; priority: number };
@@ -52,6 +53,9 @@ export class PGRouter {
     }
     if (this.options.gateways.midtrans?.enabled) {
       this.adapters.set('midtrans', new MidtransAdapter(this.options.gateways.midtrans));
+    }
+    if (this.options.gateways.sumopod?.enabled) {
+      this.adapters.set('sumopod', new SumopodAdapter(this.options.gateways.sumopod));
     }
     if (this.options.gateways.sandbox?.enabled) {
       this.adapters.set('sandbox', new SandboxAdapter(this.options.gateways.sandbox));

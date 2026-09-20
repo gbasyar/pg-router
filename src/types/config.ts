@@ -30,8 +30,18 @@ export interface PaydisiniConfig extends BaseGatewayConfig {
 
 export interface MidtransConfig extends BaseGatewayConfig {
   serverKey: string;
-  clientKey: string;
+  clientKey?: string;
+  merchantId?: string;
   isSandbox?: boolean;
+  baseUrl?: string;
+}
+
+export interface SumopodConfig extends BaseGatewayConfig {
+  apiKey: string;
+  webhookSecret?: string;
+  webhookToken?: string;
+  isSandbox?: boolean;
+  baseUrl?: string;
 }
 
 export interface DuitkuConfig extends BaseGatewayConfig {
@@ -52,6 +62,7 @@ export interface PGRouterOptions {
     tripay?: TripayConfig;
     paydisini?: PaydisiniConfig;
     midtrans?: MidtransConfig;
+    sumopod?: SumopodConfig;
     duitku?: DuitkuConfig;
     xendit?: XenditConfig;
     sandbox?: BaseGatewayConfig;

@@ -26,8 +26,12 @@ export const DEFAULT_GATEWAY_FEES: Record<GatewayProvider, Partial<Record<Paymen
     VA_BRI: { percent: 0, flat: 4000 },
     VA_BNI: { percent: 0, flat: 4000 },
     VA_MANDIRI: { percent: 0, flat: 4000 },
+    VA_PERMATA: { percent: 0, flat: 4000 },
     EWALLET_GOPAY: { percent: 2.0, flat: 0 },
     EWALLET_SHOPEEPAY: { percent: 2.0, flat: 0 },
+  },
+  sumopod: {
+    QRIS: { percent: 0.7, flat: 0 },
   },
   duitku: {
     QRIS: { percent: 0.7, flat: 700 },

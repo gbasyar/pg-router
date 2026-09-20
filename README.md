@@ -4,7 +4,7 @@
 
 PG Router provides fee-based and priority-based routing, safe fallback semantics, a unified adapter contract, and verified webhook normalization.
 
-> **Maturity:** Pakasir QRIS is the first documentation-audited adapter. Tripay and Midtrans are reserved adapter surfaces and intentionally do not create payments until their official contracts are implemented and tested. Sandbox is simulation-only.
+> **Maturity:** Pakasir, Tripay, Paydisini, Midtrans, and Sumopod are verified adapters with unit tests. Duitku, Xendit, and iPaymu are reserved adapter surfaces. Sandbox is simulation-only.
 
 ## Installation
 
@@ -19,8 +19,9 @@ npm install pg-router
 | Pakasir | QRIS | Server-to-server transaction-detail confirmation | Verified |
 | Tripay | QRIS, Virtual Accounts (BCA/BRI/BNI/Mandiri/Permata), E-Wallets | HMAC-SHA256 signature verification | Verified |
 | Paydisini | QRIS, Virtual Accounts (BCA/BRI/BNI/Mandiri/Permata) | MD5 signature callback verification | Verified |
+| Midtrans | QRIS (GoPay), Virtual Accounts (BCA/BRI/BNI/Mandiri/Permata), E-Wallets | SHA-512 signature verification | Verified |
+| Sumopod | QRIS | Svix HMAC-SHA256 / Webhook-Token verification | Verified |
 | Sandbox | Simulated methods | Simulated | Development only |
-| Midtrans | Not yet implemented | Not yet implemented | Planned |
 | Duitku, Xendit, iPaymu | Not yet implemented | Not yet implemented | Planned |
 
 Pakasir has no documented webhook signature. PG Router therefore treats its webhook as an untrusted notification and confirms the transaction through Pakasir's authenticated Transaction Detail API. `signatureVerified` remains `false` even when `isValid` is `true`.
